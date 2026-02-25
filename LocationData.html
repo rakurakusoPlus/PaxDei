@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +33,6 @@
         th:hover {
             filter: brightness(0.9);
         }
-        /* ソート矢印のスタイル */
         th.sort-asc::after { content: " ▲"; font-size: 0.7em; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
         th.sort-desc::after { content: " ▼"; font-size: 0.7em; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
 
@@ -42,7 +41,6 @@
         
         .data-table-container { overflow-x: auto; }
 
-        /* Notification Toast */
         #toast {
             visibility: hidden;
             min-width: 250px;
@@ -70,7 +68,7 @@
 </head>
 <body class="min-h-screen flex flex-col pb-16">
 
-    <header class="bg-slate-900 text-white py-6 shadow-md">
+    <header class="bg-slate-900 text-white py-6 shadow-md relative z-30">
         <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight">Pax Dei: Gallia 地名データベース</h1>
@@ -85,24 +83,25 @@
 
     <main class="max-w-5xl mx-auto px-4 py-8 flex flex-col gap-8">
 
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-20">
-            <div class="w-full md:w-1/2">
-                <input type="text" id="searchInput" placeholder="🔍 地名、読み方、説明などで検索..." class="w-full border border-slate-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50">
-            </div>
-            <div class="flex gap-2 w-full md:w-auto">
-                <button onclick="copyToClipboard()" class="flex-1 md:flex-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 px-5 border border-slate-300 rounded-md shadow-sm text-sm transition flex items-center justify-center gap-2">
-                    <span>📋 コピー (Excel貼付用)</span>
-                </button>
-                <button onclick="downloadCSV()" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-5 rounded-md shadow-sm text-sm transition flex items-center justify-center gap-2">
-                    <span>⬇️ CSV保存</span>
-                </button>
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-md shadow-sm">
+            <div class="flex items-start gap-3">
+                <span class="text-amber-500 text-2xl leading-none">⚠️</span>
+                <div>
+                    <h3 class="font-bold text-amber-800 text-lg">当データベースに関する免責事項</h3>
+                    <p class="text-amber-700 mt-1 leading-relaxed">
+                        本リストの内容は、AIの調査に基づいて現実の歴史や神話から独自に推測し、まとめたものです。ゲーム内の公式な設定資料に基づくものではないため、<strong>地名の発音、語源、および神話的背景の解釈には誤りが含まれている可能性</strong>があります。あくまで冒険を楽しむための参考・考察資料としてご覧ください。
+                    </p>
+                </div>
             </div>
         </div>
 
-        <section class="bg-white rounded-lg shadow-sm border border-slate-200 p-8 border-t-4 border-t-indigo-600">
-            <h2 class="text-2xl font-bold mb-6 text-slate-800">序論：Pax Deiの世界観とGalliaの舞台背景</h2>
-            <div class="space-y-6 text-slate-700 leading-relaxed text-sm md:text-base">
-                
+        <section class="bg-white rounded-lg shadow-sm border border-slate-200 border-t-4 border-t-indigo-600">
+            <div class="p-5 md:p-6 cursor-pointer flex justify-between items-center hover:bg-slate-50 transition-colors select-none" onclick="toggleIntro()">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-800">序論：Pax Deiの世界観とGalliaの舞台背景</h2>
+                <span id="intro-icon" class="text-xl text-slate-500 transform transition-transform duration-300 ml-4 select-none">▲</span>
+            </div>
+            
+            <div id="intro-content" class="px-5 md:px-8 pb-8 space-y-6 text-slate-700 leading-relaxed text-sm md:text-base border-t border-slate-100 pt-4">
                 <div>
                     <h3 class="font-bold text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 神話と歴史が交錯する並行世界</h3>
                     <p>
@@ -113,8 +112,7 @@
                 <div>
                     <h3 class="font-bold text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 冒険の地「Gallia」と地名が語る背景</h3>
                     <p>
-                        現在プレイヤーの冒険の舞台となっているメイン地域（Region）<strong>「Gallia（ガリア）」</strong>は、古代〜中世のフランスやヨーロッパの風土にインスパイアされています。<br>
-                        本データベースの地名を紐解くと、この世界が単なるファンタジーではなく、<strong>「現実の歴史（南仏やフランク王国）」「土着のケルト神話」「アーサー王伝説や聖杯探求」</strong>といった複数の文化や伝承が融合して構築されていることが読み取れます。プレイヤーは実在した地名や伝承の英雄たちの名前を冠する土地を旅することになります。
+                        現在プレイヤーの冒険の舞台となっているメイン地域<strong>「Gallia（ガリア）」</strong>は、古代〜中世のフランスやヨーロッパの風土にインスパイアされています。本データベースの地名を紐解くと、この世界が単なるファンタジーではなく、<strong>「現実の歴史（南仏やフランク王国）」「土着のケルト神話」「アーサー王伝説や聖杯探求」</strong>といった複数の文化や伝承が融合して構築されていることが読み取れます。
                     </p>
                 </div>
 
@@ -140,16 +138,41 @@
                 <div class="bg-indigo-50 p-4 rounded-md border-l-4 border-indigo-500 mt-6 text-sm text-indigo-900 shadow-sm">
                     <p class="font-bold mb-1 flex items-center gap-2"><span>💡</span> データベース上の表記に関する補足</p>
                     <p>
-                        ゲーム内において、Lyonesse地方の下位区分（KarrekやBrecilienなど）はシステム上「Region」と呼ばれることがありますが、世界全体を指す「メイン地域（Region）」との混同を避けるため、本資料では下位区分を<strong>「エリア (Area)」</strong>と一貫して表記しています。
+                        ゲームサーバ（データセンター）のある地域を<strong>Region</strong>と表記しているため、それと混同しないようにするため、本資料では下位区分（KarrekやBrecilienなど）を<strong>エリア (Area)</strong>と一貫して表記しています。
                     </p>
                 </div>
             </div>
         </section>
 
-        <div id="data-container" class="space-y-10">
+        <div class="bg-white rounded-lg shadow-md border border-slate-200 p-4 flex flex-col gap-4 sticky top-4 z-20">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="w-full md:w-1/2">
+                    <input type="text" id="searchInput" placeholder="🔍 地名、読み方、説明などで検索..." class="w-full border border-slate-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 transition-shadow">
+                </div>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button onclick="copyToClipboard()" class="flex-1 md:flex-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 px-5 border border-slate-300 rounded-md shadow-sm text-sm transition flex items-center justify-center gap-2">
+                        <span>📋 コピー (Excel貼付用)</span>
+                    </button>
+                    <button onclick="downloadCSV()" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-5 rounded-md shadow-sm text-sm transition flex items-center justify-center gap-2">
+                        <span>⬇️ CSV保存</span>
+                    </button>
+                </div>
             </div>
+            
+            <div class="flex flex-wrap items-center gap-2 text-sm border-t border-slate-100 pt-3" id="province-links">
+                <span class="text-slate-500 font-bold py-1 text-xs uppercase tracking-wider flex items-center gap-1"><span>📍</span> Jump to:</span>
+                <a href="#prov-Lyonesse" class="prov-link px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded-md font-medium transition">Lyonesse</a>
+                <a href="#prov-Ancien" class="prov-link px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded-md font-medium transition">Ancien</a>
+                <a href="#prov-InisGallia" class="prov-link px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 rounded-md font-medium transition">Inis Gallia</a>
+                <a href="#prov-Kerys" class="prov-link px-3 py-1.5 bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 rounded-md font-medium transition">Kerys</a>
+                <a href="#prov-Merrie" class="prov-link px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded-md font-medium transition">Merrie</a>
+                <span id="link-disabled-msg" class="text-xs text-rose-500 ml-2 hidden font-medium">※検索中はジャンプ機能が無効になります</span>
+            </div>
+        </div>
+
+        <div id="data-container" class="space-y-12"></div>
         
-        <div id="noResults" class="hidden text-center py-12 text-slate-500 bg-white rounded-lg border border-slate-200">
+        <div id="noResults" class="hidden text-center py-12 text-slate-500 bg-white rounded-lg border border-slate-200 shadow-sm">
             <span class="text-3xl block mb-3">🔍</span>
             検索条件に一致するデータが見つかりませんでした。
         </div>
@@ -159,12 +182,22 @@
     <div id="toast">コピー完了しました！</div>
 
     <script>
-        // --- 1. 定義データ ---
+        function toggleIntro() {
+            const content = document.getElementById('intro-content');
+            const icon = document.getElementById('intro-icon');
+            content.classList.toggle('hidden');
+            if (content.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
         const provincesDef = [
             { 
                 name: "Lyonesse", kana: "リオネス", title: "係争地域 (Contested Province)", 
                 color: "border-red-600", bg: "bg-red-900",
-                desc: "「アーサー王伝説」や「聖杯伝説」、ブルターニュの「イス伝説」など、闘争と悲劇の物語に彩られた危険な係争地域（PvPエリア）です。過酷な環境が特徴で、特定の場所には「Feudal Shrine」が鎮座し、それ以外の土地には不吉な「Mournwood」が生い茂っています。<br><br><span class='font-bold text-slate-800'>【各エリア(Area)の背景】</span><br>・<strong class='text-slate-800'>Karrek (カレック):</strong> トリスタンとイゾルデの悲恋や、関連する騎士たちが集う地。<br>・<strong class='text-slate-800'>Brecilien (ブレシリエン):</strong> 妖精ヴィヴィアンが住まう魔法の森「ブロセリアンド」や、イス伝説など神秘的な伝承の色濃い地。<br>・<strong class='text-slate-800'>Avalon (アヴァロン):</strong> 伝説の終焉の地カムランや、死後の楽園アヴァロンを象徴する激戦と鎮魂の地。<br>・<strong class='text-slate-800'>Corbin (コービン):</strong> 聖杯伝説に登場するコルベニック城や、古代の激戦地・要塞の名を冠する過酷な地。<br>・<strong class='text-slate-800'>Central (セントラル):</strong> アーサー王の義兄ケイや聖杯探求の導き手など、物語の中核を担う存在が集まる中心地。"
+                desc: "「アーサー王伝説」や「聖杯伝説」、ブルターニュの「イス伝説」など、闘争と悲劇の物語に彩られた危険な係争地域（PvPエリア）です。過酷な環境が特徴で、特定の場所には「Feudal Shrine」が鎮座し、それ以外の土地には不吉な「Mournwood」が生い茂っています。<br><br><span class='font-bold text-slate-800'>【各エリア(Area)の背景】</span><br>・<strong class='text-slate-800'>Karrek (カレック):</strong> トリスタンとイゾルデ의 悲恋や、関連する騎士たちが集う地。<br>・<strong class='text-slate-800'>Brecilien (ブレシリエン):</strong> 妖精ヴィヴィアンが住まう魔法の森「ブロセリアンド」や、イス伝説など神秘的な伝承の色濃い地。<br>・<strong class='text-slate-800'>Avalon (アヴァロン):</strong> 伝説の終焉の地カムランや、死後の楽園アヴァロンを象徴する激戦と鎮魂の地。<br>・<strong class='text-slate-800'>Corbin (コービン):</strong> 聖杯伝説に登場するコルベニック城や、古代の激戦地・要塞の名を冠する過酷な地。<br>・<strong class='text-slate-800'>Central (セントラル):</strong> アーサー王の義兄ケイや聖杯探求の導き手など、物語の中核を担う存在が集まる中心地。"
             },
             { 
                 name: "Ancien", kana: "アンシアン", title: "Non-PvP地域 (オック語圏・南仏風)", 
@@ -173,7 +206,7 @@
             },
             { 
                 name: "Inis Gallia", kana: "イニス・ガリア", title: "Non-PvP地域 (フランク王国・辺境風)", 
-                color: "border-emerald-600", bg: "bg-emerald-800",
+                color: "border-purple-600", bg: "bg-purple-800",
                 desc: "フランク王国やカロリング朝の歴史、そしてヨーロッパ北部の深い森や険しい山脈をモチーフにしたNon-PvP地域（Heartland/Wildland）です。かつてのガリア＝ローマ時代の痕跡や、交通・軍事的な要衝として機能した高地など、少し冷涼で厳格な辺境的・修道院的な雰囲気が漂う地域です。"
             },
             { 
@@ -190,12 +223,11 @@
 
         const feudalShrines = ["Darnantes", "Dolorous", "Sarras", "Blaye", "Carnac", "Guibel", "Badon", "Camlan", "Tara", "Catalaun", "Tournai", "Bar"];
 
-        // 生データ（Non-PvPは名前をAreaに統一し、Locationを空にしています）
         const rawData = [
-            // LYONESSE (PvP地域: エリア名と場所名が両方存在)
+            // LYONESSE
             { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Segwarides", kana: "セグワリデス", origin: "アーサー王伝説の騎士", desc: "サラセン人（イスラム教徒）の血を引く円卓の騎士であり、トリスタンの恋のライバルの一人。彼の妻にトリスタンが懸想したことで血みどろの争いが生じた。" },
             { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Morholt", kana: "モルオルト", origin: "アイルランドの巨漢の騎士", desc: "イゾルデの叔父であり、アイルランドの強力な戦士。コーンウォールへの貢物を要求したが、若きトリスタンとの決闘の末に討ち取られ、物語の引き金となった。" },
-            { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Palamedes", kana: "パラメデス", origin: "サラセン人の円卓の騎士", desc: "セグワリデスの兄弟であり、イゾルデに叶わぬ恋をした悲劇の騎士。伝説上の怪物「吠える獣」を生涯にわたって追及したことで知られる。" },
+            { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Palamedes", kana: "パラメデス", origin: "サラセン人の円卓 of 騎士", desc: "セグワリデスの兄弟であり、イゾルデに叶わぬ恋をした悲劇の騎士。伝説上の怪物「吠える獣」を生涯にわたって追及したことで知られる。" },
             { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Dinadan", kana: "ディナダン", origin: "円卓の騎士", desc: "武勇や名誉よりもユーモアと現実主義を重んじた異色の騎士。トリスタンの親しい友人であり、騎士道精神の不条理を皮肉る役割を担う。" },
             { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Tristan", kana: "トリスタン", origin: "リオネスの王子・騎士", desc: "アーサー王伝説屈指の悲恋物語の主人公。叔父マルク王の妃となるイゾルデと媚薬によって永遠の愛に落ち、数々の悲劇と闘争を引き起こす。" },
             { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Isolde", kana: "イゾルデ", origin: "アイルランドの王女", desc: "トリスタンの恋人。魔法の媚薬の力により、自らの意思に反して不義の恋に身を投じることになり、中世ヨーロッパの恋愛文学における運命の女（ファム・ファタール）の象徴。" },
@@ -226,7 +258,7 @@
             { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Maleagant", kana: "メレアガント", origin: "反逆の騎士", desc: "アーサー王に敵対する国の王子。王妃ギネヴィアを誘拐するという騎士道に反する卑劣な行いをし、最後はランスロットに討たれる。" },
             { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Lionel", kana: "ライオネル", origin: "円卓の騎士", desc: "ランスロットの従兄弟。聖杯探求の過程で怒りに駆られ、実の兄弟であるボールスを殺害しようとするなど、精神的な脆さを見せる。" },
             { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Branwen", kana: "ブランウェン", origin: "ウェールズ神話の王女", desc: "『マビノギオン』の登場人物。アイルランド王に嫁ぐが虐待され、ウェールズとアイルランド間の壊滅的な戦争の火種となった悲劇の女性。" },
-            { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Catalaun", kana: "カタラウン", origin: "古代の激戦地", desc: "「カタラウヌムの戦い（シャロンの戦い）」。西暦451年、ローマ・ガリア連合軍がフン族のアッティラ王の侵攻を食い止めた歴史的な大激戦地。" },
+            { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Catalaun", kana: "カタラウン", origin: "古代の激戦地", desc: "「カタラウヌムの戦い（シャロンの戦い）」。西暦451年、ローマ・ガリア連合軍がフン族のアッティラ王の侵攻を食い止め、歴史的な大激戦地。" },
             { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Tournai", kana: "トゥルネー", origin: "ベルギーの最古の都市", desc: "ローマ帝国時代からの歴史を持ち、メロヴィング朝フランク王国の最初の首都として機能した重要な政治拠点。" },
             { province: "Lyonesse", area: "Corbin", areaKana: "コービン", name: "Bar", kana: "バル", origin: "フランスの歴史的領邦", desc: "フランス北東部に存在した「バル公国」。長きにわたりフランスと神聖ローマ帝国の間で翻弄された境界の地。" },
             { province: "Lyonesse", area: "Central", areaKana: "セントラル", name: "Amide", kana: "アミード", origin: "聖杯伝説の女性名", desc: "ランスロットを魔法で騙して関係を持ち、完全なる騎士ガラハッドを産んだ「コルベニックのエレイン」の別名。" },
@@ -234,9 +266,9 @@
             { province: "Lyonesse", area: "Central", areaKana: "セントラル", name: "Safir", kana: "サフィール", origin: "サラセン人の円卓の騎士", desc: "パラメデスの兄弟。キリスト教に改宗し円卓の騎士となるが、ランスロットとガウェインの派閥争いに巻き込まれ、故郷を追われる。" },
             { province: "Lyonesse", area: "Central", areaKana: "セントラル", name: "Dindrane", kana: "ディンドラン", origin: "聖杯探求の導き手", desc: "パーシヴァルの妹。ガラハッド、パーシヴァル、ボールスの三騎士を聖杯へと導くが、途中で癩病の乙女を救うために自らの血を捧げ尽くして命を落とす。" },
             
-            // ANCIEN (Non-PvP地域: エリア名のみ)
+            // ANCIEN
             { province: "Ancien", area: "Armanhac", areaKana: "アルマニャック", name: "", kana: "", origin: "フランスの歴史的伯国", desc: "西暦601年にアキテーヌに設立されたガスコーニュ公国の一部「アルマニャック伯領」。世界的にも有名なブランデーの産地。" },
-            { province: "Ancien", area: "Astarac", areaKana: "アスタラック", name: "", kana: "", origin: "フランスの歴史的伯国", desc: "フランス南西部、ガスコーニュ地方に存在した中世の伯国「アスタラック（Astarac）」。肥沃な農地が広がる。" },
+            { province: "Ancien", area: "Astarac", areaKana: "アスタラック", name: "", kana: "", origin: "フランスの歴史前伯国", desc: "フランス南西部、ガスコーニュ地方に存在した中世の伯国「アスタラック（Astarac）」。肥沃な農地が広がる。" },
             { province: "Ancien", area: "Gravas", areaKana: "グラヴァス", name: "", kana: "", origin: "ボルドーのワイン産地", desc: "ボルドー地方の著名なワイン産地「グラーヴ（Graves）」。ラテン語で「小石」を意味し、水はけの良い土壌を示す。" },
             { province: "Ancien", area: "Lavedan", areaKana: "ラヴダン", name: "", kana: "", origin: "ピレネー山脈の谷地", desc: "ピレネー山脈のふもとに位置するフランスの歴史的な谷地および地域。自然の要塞としての機能を持つ。" },
             { province: "Ancien", area: "Libornes", areaKana: "リボルヌ", name: "", kana: "", origin: "フランスの都市名", desc: "フランス南西部ジロンド県のコミューン「リブルヌ（Libourne）」。ドルドーニュ川沿いのワイン交易の中心地。" },
@@ -246,11 +278,11 @@
             { province: "Ancien", area: "Tursan", areaKana: "テュルサン", name: "", kana: "", origin: "フランスのワイン産地", desc: "フランス南西部ランド県の歴史的地域および独自のワイン産地。緩やかな丘陵地帯が特徴。" },
             { province: "Ancien", area: "Volvestre", areaKana: "ヴォルヴェストル", name: "", kana: "", origin: "トゥールーズ近郊の地域", desc: "トゥールーズの南に位置するフランスの自然地域。ガロンヌ川の支流が織りなす緑豊かな景観を持つ。" },
             
-            // INIS GALLIA (Non-PvP地域: エリア名のみ)
+            // INIS GALLIA
             { province: "Inis Gallia", area: "Aras", areaKana: "アラス", name: "", kana: "", origin: "フランス北部の都市", desc: "フランス北部パ＝ド＝カレー県の県都「アラス（Arras）」。中世においてはタペストリーや羊毛産業でヨーロッパ有数の繁栄を誇った。" },
             { province: "Inis Gallia", area: "Ardennes", areaKana: "アルデンヌ", name: "", kana: "", origin: "ヨーロッパの巨大な森", desc: "フランスからベルギー、ルクセンブルクにかけて広がる深い森「アルデンヌの森（Ardennes）」。歴史上、幾度も軍事的な自然の要害となった。" },
             { province: "Inis Gallia", area: "Atigny", areaKana: "アティニー", name: "", kana: "", origin: "カロリング朝の離宮", desc: "フランス北東部アルデンヌ県のコミューン「アティニー（Attigny）」。初期中世においてフランク王国の重要な離宮が置かれた。" },
-            { province: "Inis Gallia", area: "Javerdus", areaKana: "ジャヴェルデュス", name: "", kana: "", origin: "ゲーム内独自の地理呼称", desc: "ゲーム内でプレイヤーが橋を建設したり、狼の洞窟が存在する地域。ガリア・ラテン系を模した造語の可能性が高い。" },
+            { province: "Inis Gallia", area: "Javerdus", areaKana: "ジャヴェルデュス", name: "", kana: "", origin: "フランスの実在地名の合成造語", desc: "実在するフランスの村「Javerdat（巨石遺跡が残る）」や「Javernant（狼の伝説が残る）」を掛け合わせ、古代ガリア風の接尾辞「-us」を付与した造語と推測されます。ゲーム内で「オオカミの洞窟」が存在する設定も、Javernantの伝承と符合します。" },
             { province: "Inis Gallia", area: "Jura", areaKana: "ジュラ", name: "", kana: "", origin: "ヨーロッパの山脈", desc: "フランス東部とスイスの国境に広がる「ジュラ山脈（Jura）」。地質学の「ジュラ紀」の語源でもある古い地層と険しい地形。" },
             { province: "Inis Gallia", area: "Langres", areaKana: "ラングル", name: "", kana: "", origin: "フランスの高原・都市", desc: "フランス北東部の都市および高原「ラングル（Langres）」。セーヌ川やマルヌ川の水源となる古代からの交通・軍事の要衝。" },
             { province: "Inis Gallia", area: "Morvian", areaKana: "モルヴァン", name: "", kana: "", origin: "ブルゴーニュの山塊", desc: "ブルゴーニュ地方の山塊および広大な森林地帯「モルヴァン（Morvan）」に由来。ケルト語で「黒い山」を意味するとされる。" },
@@ -258,7 +290,7 @@
             { province: "Inis Gallia", area: "Trecassis", areaKana: "トリカッシ", name: "", kana: "", origin: "古代ガリアの部族", desc: "古代ガリアに存在したケルト系部族「トリカッシ族（Tricasses）」。現在のフランスの都市トロワ（Troyes）の語源となった。" },
             { province: "Inis Gallia", area: "Vitry", areaKana: "ヴィトリー", name: "", kana: "", origin: "フランスの一般的な地名", desc: "フランス北東部の都市名「ヴィトリー＝ル＝フランソワ（Vitry-le-François）」など、ガリア＝ローマ時代に由来する一般的な地名。" },
             
-            // KERYS (Non-PvP地域: エリア名のみ)
+            // KERYS
             { province: "Kerys", area: "Aven", areaKana: "アヴェン", name: "", kana: "", origin: "ブルトン語の「川」", desc: "ケルト系言語のブルトン語で「川」を意味する。フランスの「ポン＝タヴェン（Pont-Aven）」などにその名残が見られる。" },
             { province: "Kerys", area: "Bronyr", areaKana: "ブロニール", name: "", kana: "", origin: "ウェールズ語の接頭辞", desc: "ウェールズ語で「丘の胸（Bron-yr）」を意味し、小高い丘や斜面を示す地形的な特徴を表す地名。" },
             { province: "Kerys", area: "Dolavon", areaKana: "ドラヴォン", name: "", kana: "", origin: "ウェールズ語の合成語", desc: "ウェールズ語の「Dol（草地・牧草地）」と「Afon（川）」を組み合わせた「川辺の草地」を意味する牧歌的な地名。" },
@@ -270,7 +302,7 @@
             { province: "Kerys", area: "Tremen", areaKana: "トレメン", name: "", kana: "", origin: "ブルトン語の「通過」", desc: "ブルトン語で「通過する」「道程」「小道（Passage）」を意味する言葉であり、交通の要所や峠を示す。" },
             { province: "Kerys", area: "Vanes", areaKana: "ヴァンヌ", name: "", kana: "", origin: "ブルターニュの主要都市", desc: "ブルターニュ地方の主要都市「ヴァンヌ（Vannes / Gwened）」。古代にこの地を支配しカエサルに反抗した海洋部族「ウェネティ族」に由来。" },
             
-            // MERRIE (Non-PvP地域: エリア名のみ)
+            // MERRIE
             { province: "Merrie", area: "Ardbog", areaKana: "アードボッグ", name: "", kana: "", origin: "ケルト語と英語の合成語", desc: "ゲール語の「Ard（高い）」と、英語の「Bog（泥炭地、湿地）」の合成語。スコットランドやアイルランド特有の荒涼とした高層湿原を想起させる。" },
             { province: "Merrie", area: "Bearm", areaKana: "ベアルム", name: "", kana: "", origin: "古英語由来の語彙", desc: "古英語やアングロサクソン由来の名称。「Beorm（熊、あるいは力強い戦士）」に関連し、古き森の力強さを示す。" },
             { province: "Merrie", area: "Caster", areaKana: "カスター", name: "", kana: "", origin: "イングランドの地名接尾辞", desc: "ラテン語の「Castrum（ローマの軍営・要塞）」に由来する、ランカスター（Lancaster）などのイングランドの一般的な地名接尾辞。" },
@@ -283,7 +315,6 @@
             { province: "Merrie", area: "Yarborn", areaKana: "ヤーボーン", name: "", kana: "", origin: "古英語的な造語", desc: "古英語の「Yare（川、あるいは準備ができた）」と「Born/Burn（小川）」を思わせる、アングロサクソン風の響きを持つ造語。" }
         ];
 
-        // --- 2. 状態管理 ---
         let currentData = [...rawData];
         let sortStates = {};
 
@@ -292,7 +323,6 @@
         const statTotal = document.getElementById('stat-total');
         const searchInput = document.getElementById('searchInput');
 
-        // --- 3. 描画ロジック ---
         function renderTables() {
             container.innerHTML = '';
             
@@ -317,7 +347,6 @@
                     }
 
                     const isPvP = prov.name === "Lyonesse";
-
                     const getSortClass = (col) => {
                         if (sortStates[prov.name] && sortStates[prov.name].col === col) {
                             return sortStates[prov.name].asc ? 'sort-asc' : 'sort-desc';
@@ -325,8 +354,10 @@
                         return '';
                     };
 
+                    const provId = 'prov-' + prov.name.replace(/\s+/g, '');
                     const section = document.createElement('section');
-                    section.className = "bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden";
+                    section.id = provId;
+                    section.className = "bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden scroll-mt-48";
 
                     let html = `
                         <div class="p-6 border-b border-slate-200 bg-slate-50">
@@ -371,33 +402,22 @@
                                 isNewArea = true;
                                 let rowspan = 1;
                                 for (let j = index + 1; j < provData.length; j++) {
-                                    if (provData[j].area === row.area) {
-                                        rowspan++;
-                                    } else {
-                                        break;
-                                    }
+                                    if (provData[j].area === row.area) rowspan++;
+                                    else break;
                                 }
                                 skipAreaTd = rowspan - 1;
-                                
-                                const areaDisplay = row.area 
-                                    ? `${row.area}<br><span class="text-xs text-slate-500 font-normal mt-1 inline-block">${row.areaKana}</span>` 
-                                    : "-";
-                                
+                                const areaDisplay = row.area ? `${row.area}<br><span class="text-xs text-slate-500 font-normal mt-1 inline-block">${row.areaKana}</span>` : "-";
                                 const bgClass = areaGroupIndex % 2 === 0 ? "bg-indigo-50/40" : "bg-slate-50";
                                 areaGroupIndex++;
-
                                 areaTd = `<td rowspan="${rowspan}" class="font-bold text-slate-800 ${bgClass} border-r-2 border-slate-200 shadow-inner" style="vertical-align: middle; text-align: center;">${areaDisplay}</td>`;
                             } else {
                                 skipAreaTd--;
                             }
                         } else {
-                            const areaDisplay = row.area 
-                                ? `${row.area}<br><span class="text-xs text-slate-500 font-normal mt-1 inline-block">${row.areaKana}</span>` 
-                                : "-";
+                            const areaDisplay = row.area ? `${row.area}<br><span class="text-xs text-slate-500 font-normal mt-1 inline-block">${row.areaKana}</span>` : "-";
                             areaTd = `<td class="font-bold text-slate-900 text-base">${areaDisplay}</td>`;
                         }
 
-                        // 新しいエリアの開始行は上線を少し太くする（1行目以外）
                         const topBorderClass = isNewArea && index !== 0 ? "border-t-2 border-slate-300" : "";
 
                         html += `
@@ -405,19 +425,12 @@
                                 ${areaTd}
                                 ${isPvP ? `<td class="font-bold text-slate-900 ${topBorderClass}">${row.name}<br><span class="text-xs font-normal text-slate-500 mt-1 inline-block">${row.kana}</span>${tags}</td>` : ''}
                                 <td class="text-xs text-slate-600 font-medium ${topBorderClass}">${row.origin}</td>
-                                <td class="leading-relaxed text-sm text-slate-700 ${topBorderClass}">
-                                    ${row.desc}
-                                </td>
+                                <td class="leading-relaxed text-sm text-slate-700 ${topBorderClass}">${row.desc}</td>
                             </tr>
                         `;
                     });
 
-                    html += `
-                                </tbody>
-                            </table>
-                        </div>
-                    `;
-
+                    html += `</tbody></table></div>`;
                     section.innerHTML = html;
                     container.appendChild(section);
                 });
@@ -425,81 +438,63 @@
             statTotal.innerText = currentData.length;
         }
 
-        // --- 4. インタラクション (検索・ソート) ---
         function applySearch() {
             const term = searchInput.value.toLowerCase();
+            const links = document.querySelectorAll('.prov-link');
+            const msg = document.getElementById('link-disabled-msg');
+
             if (!term) {
                 currentData = [...rawData];
+                links.forEach(link => link.classList.remove('opacity-40', 'pointer-events-none', 'grayscale'));
+                msg.classList.add('hidden');
             } else {
                 currentData = rawData.filter(row => {
                     const areaKanaSafe = row.areaKana || "";
                     const nameSafe = row.name || "";
                     const kanaSafe = row.kana || "";
-                    return nameSafe.toLowerCase().includes(term) || 
-                           kanaSafe.includes(term) || 
-                           row.desc.includes(term) ||
-                           row.origin.includes(term) ||
-                           row.area.toLowerCase().includes(term) ||
-                           areaKanaSafe.includes(term);
+                    return nameSafe.toLowerCase().includes(term) || kanaSafe.includes(term) || row.desc.includes(term) || row.origin.includes(term) || row.area.toLowerCase().includes(term) || areaKanaSafe.includes(term);
                 });
+                links.forEach(link => link.classList.add('opacity-40', 'pointer-events-none', 'grayscale'));
+                msg.classList.remove('hidden');
             }
             renderTables();
         }
 
         window.handleSort = function(provName, col) {
-            if (!sortStates[provName]) {
-                sortStates[provName] = { col: col, asc: true };
-            } else {
-                if (sortStates[provName].col === col) {
-                    sortStates[provName].asc = !sortStates[provName].asc;
-                } else {
-                    sortStates[provName] = { col: col, asc: true };
-                }
+            if (!sortStates[provName]) sortStates[provName] = { col: col, asc: true };
+            else {
+                if (sortStates[provName].col === col) sortStates[provName].asc = !sortStates[provName].asc;
+                else sortStates[provName] = { col: col, asc: true };
             }
             renderTables();
-        };
+        }
 
         searchInput.addEventListener('input', applySearch);
 
-        // --- 5. エクスポート機能 (CSV / Clipboard) ---
-        
         window.copyToClipboard = function() {
             let tsv = "Province (地方)\tエリア (Area)\t場所名 (Location)\t語源・元ネタ\t詳細な背景・環境的文脈\n";
             currentData.forEach(row => {
                 const safeDesc = row.desc.replace(/\n/g, ' '); 
                 let extraTag = "";
-                if (row.province === "Lyonesse") {
-                    extraTag = feudalShrines.includes(row.name) ? " [Feudal Shrine]" : " [Mournwood]";
-                }
+                if (row.province === "Lyonesse") extraTag = feudalShrines.includes(row.name) ? " [Feudal Shrine]" : " [Mournwood]";
                 const areaStr = row.area ? `${row.area} (${row.areaKana})` : "-";
                 const nameStr = row.name ? `${row.name} (${row.kana})` : "";
-                
                 tsv += `${row.province}\t${areaStr}\t${nameStr}\t${row.origin}\t${safeDesc}${extraTag}\n`;
             });
-
-            navigator.clipboard.writeText(tsv).then(() => {
-                showToast("クリップボードにコピーしました！\nExcelに直接貼り付けられます。");
-            }).catch(err => {
-                alert("コピーに失敗しました。ブラウザの権限を確認してください。");
-            });
+            navigator.clipboard.writeText(tsv).then(() => showToast("クリップボードにコピーしました！\nExcelに直接貼り付けられます。"));
         };
 
         window.downloadCSV = function() {
             let csvContent = '\uFEFF'; 
             csvContent += "Province,Area,Location,Origin,Description\n";
-            
             currentData.forEach(row => {
                 let extraTag = "";
-                if (row.province === "Lyonesse") {
-                    extraTag = feudalShrines.includes(row.name) ? " [Feudal Shrine]" : " [Mournwood]";
-                }
+                if (row.province === "Lyonesse") extraTag = feudalShrines.includes(row.name) ? " [Feudal Shrine]" : " [Mournwood]";
                 const areaStr = row.area ? `${row.area} (${row.areaKana})` : "-";
                 const nameStr = row.name ? `${row.name} (${row.kana})` : "";
-                
                 const safeDesc = (row.desc + extraTag).replace(/"/g, '""');
                 csvContent += `"${row.province}","${areaStr}","${nameStr}","${row.origin}","${safeDesc}"\n`;
             });
-
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
@@ -515,13 +510,10 @@
             const toast = document.getElementById('toast');
             toast.innerText = message;
             toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // 初期描画
-        window.addEventListener('DOMContentLoaded', () => {
-            renderTables();
-        });
+        window.addEventListener('DOMContentLoaded', renderTables);
     </script>
 </body>
 </html>
