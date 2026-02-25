@@ -6,73 +6,78 @@
     <title>Pax Dei: Gallia 地名・伝承データベース</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-color: #f8fafc;
-            color: #334155;
+    <style id="common-styles">
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f8fafc; color: #334155; margin: 0; padding: 0; }
+        
+        /* テーブル基本スタイル */
+        table { 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            width: 100%; 
+            font-size: 0.875rem; 
+            border-top: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 0.875rem;
+        
+        th, td { 
+            border-right: 1px solid #e2e8f0; 
+            border-bottom: 1px solid #e2e8f0; 
+            padding: 12px 16px; 
+            vertical-align: top; 
         }
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 12px 16px;
-            vertical-align: top;
+
+        /* データ行のみ背景色を白にし、ヘッダー(th)は各設定の背景色を活かす */
+        td {
+            background-color: #fff;
         }
-        th {
-            font-weight: 600;
-            text-align: left;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            position: relative;
-            user-select: none;
+        
+        /* ヘッダーの設定（検索バーの下に隠れるようにz-indexを調整） */
+        th { 
+            font-weight: 600; 
+            text-align: left; 
+            cursor: pointer; 
+            position: sticky; 
+            top: 0; 
+            z-index: 30; 
+            color: #fff; 
         }
-        th:hover {
-            filter: brightness(0.9);
-        }
+        
+        th:hover { filter: brightness(0.9); }
         th.sort-asc::after { content: " ▲"; font-size: 0.7em; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
         th.sort-desc::after { content: " ▼"; font-size: 0.7em; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); }
-
-        tr:nth-child(even) td { background-color: #f8fafc; }
-        tr:hover td { background-color: #eff6ff; }
         
-        .data-table-container { overflow-x: auto; }
+        /* 行の背景色 */
+        tbody tr:nth-child(even) td { background-color: #f8fafc; }
+        tbody tr:hover td { background-color: #eff6ff; }
+        
+        /* スクロールコンテナ */
+        .data-table-container { 
+            overflow-x: auto; 
+            border-radius: 0.5rem; 
+            background-color: #fff; 
+            -webkit-overflow-scrolling: touch; 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
 
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #10b981;
-            color: #fff;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 50;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
+        /* ジャンプリンク横スクロールバー非表示 */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @media (max-width: 767px) {
+            table { min-width: 750px; } /* スマホでも表を縮めずスクロールさせる */
         }
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 50px;
-        }
+
+        #toast { visibility: hidden; min-width: 250px; background-color: #10b981; color: #fff; text-align: center; border-radius: 4px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col pb-16">
 
-    <header class="bg-slate-900 text-white py-6 shadow-md relative z-30">
+    <header class="bg-slate-900 text-white py-6 shadow-md relative z-50">
         <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight">Pax Dei: Gallia 地名データベース</h1>
-                <p class="mt-2 text-slate-400">地方（Province）ごとの語源・神話的背景の包括的リスト</p>
+                <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Pax Dei: Gallia 地名データベース</h1>
+                <p class="mt-2 text-slate-400 text-sm md:text-base">地方（Province）ごとの語源・神話的背景の包括的リスト</p>
             </div>
             <div class="bg-slate-800 px-4 py-2 rounded shadow-inner border border-slate-700 flex items-center gap-2">
                 <span class="text-slate-300 text-sm">表示件数:</span>
@@ -81,14 +86,13 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-8 flex flex-col gap-8">
-
-        <div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-md shadow-sm">
+    <main id="main-container" class="max-w-5xl mx-auto px-4 py-6 md:py-8 flex flex-col gap-6 md:gap-8 w-full">
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 md:p-5 rounded-r-md shadow-sm">
             <div class="flex items-start gap-3">
-                <span class="text-amber-500 text-2xl leading-none">⚠️</span>
+                <span class="text-amber-500 text-xl md:text-2xl leading-none">⚠️</span>
                 <div>
-                    <h3 class="font-bold text-amber-800 text-lg">当データベースに関する免責事項</h3>
-                    <p class="text-amber-700 mt-1 leading-relaxed">
+                    <h3 class="font-bold text-amber-800 text-base md:text-lg">当データベースに関する免責事項</h3>
+                    <p class="text-amber-700 mt-1 leading-relaxed text-xs md:text-sm">
                         本リストの内容は、AIの調査に基づいて現実の歴史や神話から独自に推測し、まとめたものです。ゲーム内の公式な設定資料に基づくものではないため、<strong>地名の発音、語源、および神話的背景の解釈には誤りが含まれている可能性</strong>があります。あくまで冒険を楽しむための参考・考察資料としてご覧ください。
                     </p>
                 </div>
@@ -96,85 +100,67 @@
         </div>
 
         <section class="bg-white rounded-lg shadow-sm border border-slate-200 border-t-4 border-t-indigo-600">
-            <div class="p-5 md:p-6 cursor-pointer flex justify-between items-center hover:bg-slate-50 transition-colors select-none" onclick="toggleIntro()">
-                <h2 class="text-xl md:text-2xl font-bold text-slate-800">序論：Pax Deiの世界観とGalliaの舞台背景</h2>
-                <span id="intro-icon" class="text-xl text-slate-500 transform transition-transform duration-300 ml-4 select-none">▲</span>
+            <div class="p-4 md:p-6 cursor-pointer flex justify-between items-center hover:bg-slate-50 transition-colors select-none" onclick="toggleIntro()">
+                <h2 class="text-lg md:text-2xl font-bold text-slate-800">序論：Pax Deiの世界観とGalliaの舞台背景</h2>
+                <span id="intro-icon" class="text-lg md:text-xl text-slate-500 transform transition-transform duration-300">▼</span>
             </div>
-            
-            <div id="intro-content" class="px-5 md:px-8 pb-8 space-y-6 text-slate-700 leading-relaxed text-sm md:text-base border-t border-slate-100 pt-4">
+            <div id="intro-content" class="px-4 md:px-8 pb-6 md:pb-8 space-y-4 md:space-y-6 text-slate-700 text-xs md:text-sm leading-relaxed border-t border-slate-100 pt-4 hidden">
                 <div>
-                    <h3 class="font-bold text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 神話と歴史が交錯する並行世界</h3>
-                    <p>
-                        『Pax Dei』の舞台は、中世ヨーロッパの人々が信じていた神話、伝承、迷信が「現実の物理法則」として実在する並行世界です。幽霊や魔法、神の奇跡といった超常的な存在が、単なるおとぎ話ではなく、実際に人々の生活や自然環境に影響を与えている世界を描いています。
-                    </p>
+                    <h3 class="font-bold text-base md:text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 神話と歴史が交錯する並行世界</h3>
+                    <p>『Pax Dei』の舞台は、中世ヨーロッパの人々が信じていた神話、伝承、迷信が「現実の物理法則」として実在する並行世界です。幽霊や魔法、神の奇跡といった超常的な存在が、単なるおとぎ話ではなく、実際に人々の生活や自然環境に影響を与えている世界を描いています。</p>
                 </div>
-
                 <div>
-                    <h3 class="font-bold text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 冒険の地「Gallia」と地名が語る背景</h3>
-                    <p>
-                        現在プレイヤーの冒険の舞台となっているメイン地域<strong>「Gallia（ガリア）」</strong>は、古代〜中世のフランスやヨーロッパの風土にインスパイアされています。本データベースの地名を紐解くと、この世界が単なるファンタジーではなく、<strong>「現実の歴史（南仏やフランク王国）」「土着のケルト神話」「アーサー王伝説や聖杯探求」</strong>といった複数の文化や伝承が融合して構築されていることが読み取れます。
-                    </p>
+                    <h3 class="font-bold text-base md:text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 冒険の地「Gallia」と地名が語る背景</h3>
+                    <p>現在プレイヤーの冒険の舞台となっているメイン地域<strong>「Gallia（ガリア）」</strong>は、古代〜中世のフランスやヨーロッパの風土にインスパイアされています。本データベースの地名を紐解くと、この世界が単なるファンタジーではなく、<strong>「現実の歴史（南仏やフランク王国）」「土着のケルト神話」「アーサー王伝説や聖杯探求」</strong>といった複数の文化や伝承が融合して構築されていることが読み取れます。</p>
                 </div>
-
                 <div>
-                    <h3 class="font-bold text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 地方（Province）とエリアの性質</h3>
-                    <p class="mb-3">Galliaの内部はさらに<strong>「地方（Province）」</strong>に分割され、プレイスタイルに応じた以下の環境が用意されています。</p>
-                    
-                    <ul class="list-none space-y-3 bg-slate-50 p-5 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-base md:text-lg text-indigo-900 border-b border-indigo-100 pb-1 mb-2">■ 地方（Province）とエリアの性質</h3>
+                    <p class="mb-2">Galliaの内部はさらに<strong>「地方（Province）」</strong>に分割され、以下の環境が用意されています。</p>
+                    <ul class="list-none space-y-2 bg-slate-50 p-4 md:p-5 rounded-md border border-slate-200">
                         <li>
-                            <strong class="text-slate-800 text-base">🛡️ Non-PvP地域（Ancien, Inis Gallia, Kerys, Merrie）</strong>
-                            <ul class="list-disc pl-6 mt-2 text-slate-600 space-y-1">
+                            <strong class="text-slate-800">🛡️ Non-PvP地域（Ancien, Inis Gallia, Kerys, Merrie）</strong>
+                            <ul class="list-disc pl-5 mt-1 text-slate-600">
                                 <li><strong class="text-emerald-700">Heartland（ハートランド）:</strong> 安全に定住し、家や村を建築できる平穏な生活の基盤。</li>
                                 <li><strong class="text-amber-700">Wildland（ワイルドランド）:</strong> 建築は不可能だが、より希少な資源や危険な敵が潜む未開の地。</li>
                             </ul>
                         </li>
                         <li class="pt-2 border-t border-slate-200">
-                            <strong class="text-slate-800 text-base">⚔️ 係争地域 / Contested Province（Lyonesse）</strong>
-                            <p class="mt-2 text-slate-600 pl-6">プレイヤー同士の苛烈な戦闘（PvP）が展開される危険地帯。アーサー王伝説などの「闘争と悲劇」を象徴する地名が集中しています。</p>
+                            <strong class="text-slate-800">⚔️ 係争地域 / Contested Province（Lyonesse）</strong>
+                            <p class="mt-1 text-slate-600 pl-5">プレイヤー同士の苛烈な戦闘（PvP）が展開される危険地帯。闘争と悲劇を象徴する地名が集中しています。</p>
                         </li>
                     </ul>
                 </div>
-
-                <div class="bg-indigo-50 p-4 rounded-md border-l-4 border-indigo-500 mt-6 text-sm text-indigo-900 shadow-sm">
+                <div class="bg-indigo-50 p-3 md:p-4 rounded-md border-l-4 border-indigo-500 mt-4 text-indigo-900 shadow-sm">
                     <p class="font-bold mb-1 flex items-center gap-2"><span>💡</span> データベース上の表記に関する補足</p>
-                    <p>
-                        ゲームサーバ（データセンター）のある地域を<strong>Region</strong>と表記しているため、それと混同しないように本資料では下位区分（KarrekやBrecilienなど）を<strong>エリア (Area)</strong>と一貫して表記しています。
-                    </p>
+                    <p>ゲームサーバ（データセンター）のある地域を<strong>Region</strong>と表記しているため、それと混同しないよう本資料では下位区分（KarrekやBrecilienなど）を<strong>エリア (Area)</strong>と一貫して表記しています。</p>
                 </div>
             </div>
         </section>
 
-        <div class="bg-white rounded-lg shadow-md border border-slate-200 p-4 flex flex-col gap-4 sticky top-4 z-20">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="w-full md:w-1/2">
-                    <input type="text" id="searchInput" placeholder="🔍 地名、読み方、説明などで検索..." class="w-full border border-slate-300 rounded-md p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 transition-shadow">
-                </div>
+        <div class="bg-white rounded-lg shadow-md border border-slate-200 p-3 md:p-4 flex flex-col gap-3 sticky top-0 md:top-2 z-50">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+                <input type="text" id="searchInput" placeholder="🔍 地名、読み方、説明などで検索..." class="w-full md:w-1/2 border border-slate-300 rounded-md p-2 md:p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50">
                 <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="copyToClipboard()" class="flex-1 md:flex-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 px-5 border border-slate-300 rounded-md shadow-sm text-sm transition flex items-center justify-center gap-2">
-                        <span>📋 コピー (Excel貼付用)</span>
-                    </button>
-                    <button onclick="downloadCSV()" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-5 rounded-md shadow-sm text-sm transition flex items-center justify-center gap-2">
-                        <span>⬇️ CSV保存</span>
-                    </button>
+                    <button onclick="copyToClipboard()" class="flex-1 md:flex-none bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2 px-4 border border-slate-300 rounded-md shadow-sm text-xs md:text-sm transition flex items-center justify-center gap-1">📋 コピー</button>
+                    <button onclick="downloadCSV()" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-md shadow-sm text-xs md:text-sm transition flex items-center justify-center gap-1">⬇️ CSV保存</button>
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center gap-2 text-sm border-t border-slate-100 pt-3" id="province-links">
-                <span class="text-slate-500 font-bold py-1 text-xs uppercase tracking-wider flex items-center gap-1"><span>📍</span> Jump to:</span>
-                <a href="#prov-Lyonesse" class="prov-link px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded-md font-medium transition">Lyonesse</a>
-                <a href="#prov-Ancien" class="prov-link px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded-md font-medium transition">Ancien</a>
-                <a href="#prov-InisGallia" class="prov-link px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 rounded-md font-medium transition">Inis Gallia</a>
-                <a href="#prov-Kerys" class="prov-link px-3 py-1.5 bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 rounded-md font-medium transition">Kerys</a>
-                <a href="#prov-Merrie" class="prov-link px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded-md font-medium transition">Merrie</a>
-                <span id="link-disabled-msg" class="text-xs text-rose-500 ml-2 hidden font-medium">※検索中はジャンプ機能が無効になります</span>
+            <div class="flex flex-nowrap overflow-x-auto hide-scrollbar items-center gap-1.5 md:gap-2 border-t border-slate-100 pt-2 pb-1" id="province-links">
+                <span class="text-slate-500 font-bold py-1 text-[10px] md:text-xs uppercase tracking-tight whitespace-nowrap">📍Jump:</span>
+                <a href="#prov-Lyonesse" class="prov-link px-2 py-1 md:px-3 md:py-1.5 bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 rounded md:rounded-md font-medium text-[10px] md:text-sm whitespace-nowrap transition">Lyonesse</a>
+                <a href="#prov-Ancien" class="prov-link px-2 py-1 md:px-3 md:py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded md:rounded-md font-medium text-[10px] md:text-sm whitespace-nowrap transition">Ancien</a>
+                <a href="#prov-InisGallia" class="prov-link px-2 py-1 md:px-3 md:py-1.5 bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 rounded md:rounded-md font-medium text-[10px] md:text-sm whitespace-nowrap transition">Inis Gallia</a>
+                <a href="#prov-Kerys" class="prov-link px-2 py-1 md:px-3 md:py-1.5 bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100 rounded md:rounded-md font-medium text-[10px] md:text-sm whitespace-nowrap transition">Kerys</a>
+                <a href="#prov-Merrie" class="prov-link px-2 py-1 md:px-3 md:py-1.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded md:rounded-md font-medium text-[10px] md:text-sm whitespace-nowrap transition">Merrie</a>
+                <span id="link-disabled-msg" class="text-[10px] md:text-xs text-rose-500 ml-1 hidden font-medium whitespace-nowrap">※検索中は無効</span>
             </div>
         </div>
 
-        <div id="data-container" class="space-y-12"></div>
+        <div id="data-container" class="space-y-8 md:space-y-12 w-full"></div>
         
         <div id="noResults" class="hidden text-center py-12 text-slate-500 bg-white rounded-lg border border-slate-200 shadow-sm">
-            <span class="text-3xl block mb-3">🔍</span>
-            検索条件に一致するデータが見つかりませんでした。
+            <span class="text-3xl block mb-3">🔍</span> 条件に一致するデータが見つかりませんでした。
         </div>
 
     </main>
@@ -182,47 +168,21 @@
     <div id="toast">コピー完了しました！</div>
 
     <script>
-        function toggleIntro() {
-            const content = document.getElementById('intro-content');
-            const icon = document.getElementById('intro-icon');
-            content.classList.toggle('hidden');
-            if (content.classList.contains('hidden')) {
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                icon.style.transform = 'rotate(0deg)';
-            }
-        }
+        const isMobile = () => window.innerWidth < 768;
+        let isInitialLoad = true;
+        let provDescStates = {};
 
         const provincesDef = [
-            { 
-                name: "Lyonesse", kana: "リオネス", title: "係争地域 (Contested Province)", 
-                color: "border-red-600", bg: "bg-red-900",
-                desc: "「アーサー王伝説」や「聖杯伝説」、ブルターニュの「イス伝説」など、闘争と悲劇の物語に彩られた危険な係争地域（PvPエリア）です。過酷な環境が特徴で、特定の場所には「Feudal Shrine」が鎮座し、それ以外の土地には不吉な「Mournwood」が生い茂っています。<br><br><span class='font-bold text-slate-800'>【各エリア(Area)の背景】</span><br>・<strong class='text-slate-800'>Karrek (カレック):</strong> トリスタンとイゾルデの悲恋や、関連する騎士たちが集う地。<br>・<strong class='text-slate-800'>Brecilien (ブレシリエン):</strong> 妖精ヴィヴィアンが住まう魔法の森「ブロセリアンド」や、イス伝説など神秘的な伝承の色濃い地。<br>・<strong class='text-slate-800'>Avalon (アヴァロン):</strong> 伝説の終焉の地カムランや、死後の楽園アヴァロンを象徴する激戦と鎮魂の地。<br>・<strong class='text-slate-800'>Corbin (コービン):</strong> 聖杯伝説に登場するコルベニック城や、古代の激戦地・要塞の名を冠する過酷な地。<br>・<strong class='text-slate-800'>Central (セントラル):</strong> アーサー王の義兄ケイや聖杯探求の導き手など、物語の中核を担う存在が集まる中心地。"
-            },
-            { 
-                name: "Ancien", kana: "アンシアン", title: "Non-PvP地域 (オック語圏・南仏風)", 
-                color: "border-amber-500", bg: "bg-amber-700",
-                desc: "フランス南部・オック語圏の歴史や風土にインスパイアされたNon-PvP地域（Heartland/Wildland）です。アキテーヌやガスコーニュといった歴史的地域、ボルドー地方の著名なワイン産地など、温暖で豊かな実在の地理・歴史がベースとなっており、古代から続く交易や農業の息吹を感じさせます。"
-            },
-            { 
-                name: "Inis Gallia", kana: "イニス・ガリア", title: "Non-PvP地域 (フランク王国・辺境風)", 
-                color: "border-purple-600", bg: "bg-purple-800",
-                desc: "フランク王国やカロリング朝の歴史、そしてヨーロッパ北部の深い森や険しい山脈をモチーフにしたNon-PvP地域（Heartland/Wildland）です。かつてのガリア＝ローマ時代の痕跡や、交通・軍事的な要衝として機能した高地など、少し冷涼で厳格な辺境的・修道院的な雰囲気が漂う地域です。"
-            },
-            { 
-                name: "Kerys", kana: "ケリス", title: "Non-PvP地域 (ケルト・ブルターニュ風)", 
-                color: "border-teal-600", bg: "bg-teal-800",
-                desc: "フランス西部のブルターニュ地方（ケルト文化圏）の伝承や、ウェールズ語圏の文化に深く根ざしたNon-PvP地域（Heartland/Wildland）です。ブルトン語やウェールズ語で川、平原、丘陵を示す地形用語が多く用いられており、巨石遺跡や古代の海洋部族の記憶が息づく、神秘的で土着的なケルトの風が吹く地域となっています。"
-            },
-            { 
-                name: "Merrie", kana: "メリー", title: "Non-PvP地域 (古き良きイングランド風)", 
-                color: "border-blue-600", bg: "bg-blue-800",
-                desc: "「古き良きイングランド（Merry England）」やアイルランドの牧歌的な風景、アングロ・サクソン文化をベースにしたNon-PvP地域（Heartland/Wildland）です。なだらかな丘陵（ダウン）や湿原（泥炭地）、のどかな州（シャイア）など、トールキンの世界観にも通じる緑豊かで伝統的な景観を彷彿とさせる地名が付けられています。"
-            }
+            { name: "Lyonesse", kana: "リオネス", title: "係争地域 (Contested Province)", color: "border-red-600", bg: "bg-red-900", desc: "「アーサー王伝説」や「聖杯伝説」、ブルターニュの「イス伝説」など、闘争と悲劇の物語に彩られた危険な係争地域（PvPエリア）です。過酷な環境が特徴で、特定の場所には「Feudal Shrine」が鎮座し、それ以外の土地には不吉な「Mournwood」が生い茂っています。<br><br><span class='font-bold text-slate-800'>【各エリア(Area)の背景】</span><br>・<strong class='text-slate-800'>Karrek (カレック):</strong> トリスタンとイゾルデの悲恋や、関連する騎士たちが集う地。<br>・<strong class='text-slate-800'>Brecilien (ブレシリエン):</strong> 妖精ヴィヴィアンが住まう魔法の森「ブロセリアンド」や、イス伝説など神秘的な伝承の色濃い地。<br>・<strong class='text-slate-800'>Avalon (アヴァロン):</strong> 伝説の終焉の地カムランや、死後の楽園アヴァロンを象徴する激戦と鎮魂の地。<br>・<strong class='text-slate-800'>Corbin (コービン):</strong> 聖杯伝説に登場するコルベニック城や、古代の激戦地・要塞の名を冠する過酷な地。<br>・<strong class='text-slate-800'>Central (セントラル):</strong> アーサー王の義兄ケイや聖杯探求の導き手など、物語の中核を担う存在が集まる中心地。" },
+            { name: "Ancien", kana: "アンシアン", title: "Non-PvP地域 (オック語圏・南仏風)", color: "border-amber-500", bg: "bg-amber-700", desc: "フランス南部・オック語圏の歴史や風土にインスパイアされたNon-PvP地域（Heartland/Wildland）です。アキテーヌやガスコーニュといった歴史的地域、ボルドー地方の著名なワイン産地など、温暖で豊かな実在の地理・歴史がベースとなっており、古代から続く交易や農業の息吹を感じさせます。" },
+            { name: "Inis Gallia", kana: "イニス・ガリア", title: "Non-PvP地域 (フランク王国・辺境風)", color: "border-purple-600", bg: "bg-purple-800", desc: "フランク王国やカロリング朝の歴史、およびヨーロッパ北部の深い森や険しい山脈をモチーフにしたNon-PvP地域（Heartland/Wildland）です。かつてのガリア＝ローマ時代の痕跡や、交通・軍事的な要衝として機能した高地など、少し冷涼で厳格な辺境的・修道院的な雰囲気が漂う地域です。Javerdusは狼の伝説の地Javernant等がモデルと推測されます。" },
+            { name: "Kerys", kana: "ケリス", title: "Non-PvP地域 (ケルト・ブルターニュ風)", color: "border-teal-600", bg: "bg-teal-800", desc: "フランス西部のブルターニュ地方（ケルト文化圏）の伝承や、ウェールズ語圏の文化に深く根ざしたNon-PvP地域（Heartland/Wildland）です。ブルトン語やウェールズ語で川、平原、丘陵を示す地形用語が多く用いられており、巨石遺跡や古代の海洋部族の記憶が息づく、神秘的で土着的なケルトの風が吹く地域となっています。" },
+            { name: "Merrie", kana: "メリー", title: "Non-PvP地域 (古き良きイングランド風)", color: "border-blue-600", bg: "bg-blue-800", desc: "「古き良きイングランド（Merry England）」やアイルランドの牧歌的な風景、アングロ・サクソン文化をベースにしたNon-PvP地域（Heartland/Wildland）です。なだらかな丘陵（ダウン）や湿原（泥炭地）、のどかな州（シャイア）など、トールキンの世界観にも通じる緑豊かで伝統的な景観を彷彿とさせる地名が付けられています。" }
         ];
 
         const feudalShrines = ["Darnantes", "Dolorous", "Sarras", "Blaye", "Carnac", "Guibel", "Badon", "Camlan", "Tara", "Catalaun", "Tournai", "Bar"];
 
+        // 生データ全量（完全復元）
         const rawData = [
             // LYONESSE
             { province: "Lyonesse", area: "Karrek", areaKana: "カレック", name: "Segwarides", kana: "セグワリデス", origin: "アーサー王伝説の騎士", desc: "サラセン人（イスラム教徒）の血を引く円卓の騎士であり、トリスタンの恋のライバルの一人。彼の妻にトリスタンが懸想したことで血みどろの争いが生じた。" },
@@ -246,7 +206,7 @@
             { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Constantine", kana: "コンスタンティン", origin: "ブリテンの王", desc: "アーサー王の死後、崩壊した王国と王位を継承した人物。あるいは、ローマ帝国にキリスト教をもたらした歴史上の皇帝。" },
             { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Guinevere", kana: "ギネヴィア", origin: "アーサー王の王妃", desc: "ランスロットとの許されざる不義の恋によって円卓の騎士たちを二分し、王国の滅亡を招いた悲劇の王妃。" },
             { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Patrise", kana: "パトリス", origin: "アイルランドの騎士", desc: "王妃ギネヴィアが主催した宴において、ガウェインを暗殺しようと企てられた毒入り林檎を誤って食べ、無惨な死を遂げた人物。" },
-            { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Agravain", kana: "アグラヴェイン", origin: "円卓の騎士", desc: "ガウェインの弟であり、ランスロットとギネヴィアの不義を執拗に暴き立て、結果として円卓の崩壊と内戦を引き起こした張本人。" },
+            { province: "Lyonesse", area: "Avalon", areaKana: "Agravain", areaKana: "アヴァロン", name: "Agravain", kana: "アグラヴェイン", origin: "円卓の騎士", desc: "ガウェインの弟であり、ランスロットとギネヴィアの不義を執拗に暴き立て、結果として円卓の崩壊と内戦を引き起こした張本人。" },
             { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Gareth", kana: "ガレス", origin: "円卓の騎士", desc: "ガウェインの末弟。ランスロットを深く敬愛していたが、ギネヴィアの火刑を阻止しようとしたランスロットによって、混乱の中で誤って殺害される。" },
             { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Elain", kana: "エレイン", origin: "アーサー王伝説の女性名", desc: "聖杯伝説においてガラハッドを産んだ「コルベニックのエレイン」、あるいはランスロットに報われぬ愛を捧げて死んだ「アストラットの百合の乙女」。" },
             { province: "Lyonesse", area: "Avalon", areaKana: "アヴァロン", name: "Badon", kana: "バドン", origin: "伝説の古戦場", desc: "「ベドンの丘の戦い」。アーサー王がサクソン人の侵攻を食い止め、大勝を収めたとされるブリテン防衛の歴史的転換点。" },
@@ -268,7 +228,7 @@
             
             // ANCIEN
             { province: "Ancien", area: "Armanhac", areaKana: "アルマニャック", name: "", kana: "", origin: "フランスの歴史的伯国", desc: "西暦601年にアキテーヌに設立されたガスコーニュ公国の一部「アルマニャック伯領」。世界的にも有名なブランデーの産地。" },
-            { province: "Ancien", area: "Astarac", areaKana: "アスタラック", name: "", kana: "", origin: "フランスの歴史前伯国", desc: "フランス南西部、ガスコーニュ地方に存在した中世の伯国「アスタラック（Astarac）」。肥沃な農地が広がる。" },
+            { province: "Ancien", area: "Astarac", areaKana: "アスタラック", name: "", kana: "", origin: "フランスの歴史的伯国", desc: "フランス南西部、ガスコーニュ地方に存在した中世の伯国「アスタラック（Astarac）」。肥沃な農地が広がる。" },
             { province: "Ancien", area: "Gravas", areaKana: "グラヴァス", name: "", kana: "", origin: "ボルドーのワイン産地", desc: "ボルドー地方の著名なワイン産地「グラーヴ（Graves）」。ラテン語で「小石」を意味し、水はけの良い土壌を示す。" },
             { province: "Ancien", area: "Lavedan", areaKana: "ラヴダン", name: "", kana: "", origin: "ピレネー山脈の谷地", desc: "ピレネー山脈のふもとに位置するフランスの歴史的な谷地および地域。自然の要塞としての機能を持つ。" },
             { province: "Ancien", area: "Libornes", areaKana: "リボルヌ", name: "", kana: "", origin: "フランスの都市名", desc: "フランス南西部ジロンド県のコミューン「リブルヌ（Libourne）」。ドルドーニュ川沿いのワイン交易の中心地。" },
@@ -318,14 +278,34 @@
         let currentData = [...rawData];
         let sortStates = {};
 
-        const container = document.getElementById('data-container');
-        const noResults = document.getElementById('noResults');
-        const statTotal = document.getElementById('stat-total');
-        const searchInput = document.getElementById('searchInput');
+        function initApp() {
+            // 初回アクセス時のみ、PCは開く・スマホは閉じる
+            if (isInitialLoad) {
+                const mobile = isMobile();
+                const introContent = document.getElementById('intro-content');
+                const introIcon = document.getElementById('intro-icon');
+                if (mobile) {
+                    introContent.classList.add('hidden');
+                    introIcon.innerText = '▼';
+                } else {
+                    introContent.classList.remove('hidden');
+                    introIcon.innerText = '▲';
+                }
+                
+                provincesDef.forEach(prov => {
+                    provDescStates[prov.name] = !mobile;
+                });
+                isInitialLoad = false;
+            }
+            renderTables();
+        }
 
         function renderTables() {
+            const container = document.getElementById('data-container');
+            const mobile = isMobile();
             container.innerHTML = '';
-            
+            const noResults = document.getElementById('noResults');
+
             if (currentData.length === 0) {
                 noResults.classList.remove('hidden');
             } else {
@@ -335,11 +315,11 @@
                     let provData = currentData.filter(d => d.province === prov.name);
                     if (provData.length === 0) return;
 
+                    // ソート
                     if (sortStates[prov.name]) {
                         const { col, asc } = sortStates[prov.name];
                         provData.sort((a, b) => {
-                            let valA = a[col] || '';
-                            let valB = b[col] || '';
+                            let valA = a[col] || ''; let valB = b[col] || '';
                             if (valA < valB) return asc ? -1 : 1;
                             if (valA > valB) return asc ? 1 : -1;
                             return 0;
@@ -347,173 +327,213 @@
                     }
 
                     const isPvP = prov.name === "Lyonesse";
-                    const getSortClass = (col) => {
-                        if (sortStates[prov.name] && sortStates[prov.name].col === col) {
-                            return sortStates[prov.name].asc ? 'sort-asc' : 'sort-desc';
-                        }
-                        return '';
-                    };
+                    const getSortClass = (col) => (sortStates[prov.name] && sortStates[prov.name].col === col) ? (sortStates[prov.name].asc ? 'sort-asc' : 'sort-desc') : '';
 
                     const provId = 'prov-' + prov.name.replace(/\s+/g, '');
                     const section = document.createElement('section');
                     section.id = provId;
                     section.className = "bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden scroll-mt-48";
 
+                    // 開閉IDと状態取得
+                    const descId = `desc-${prov.name.replace(/\s+/g, '')}`;
+                    const iconId = `icon-${prov.name.replace(/\s+/g, '')}`;
+                    const isOpen = provDescStates[prov.name];
+                    const descHiddenClass = isOpen ? "" : "hidden";
+                    const descIcon = isOpen ? "▲" : "▼";
+
                     let html = `
-                        <div class="p-6 border-b border-slate-200 bg-slate-50">
-                            <h3 class="text-2xl font-bold text-slate-800 border-l-4 ${prov.color} pl-3 mb-3">
-                                ${prov.name} <span class="text-lg font-medium text-slate-500 ml-1">(${prov.kana})</span> <span class="text-base font-normal text-slate-500 ml-2 block sm:inline mt-1 sm:mt-0">- ${prov.title}</span>
-                            </h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mt-2 bg-white p-4 rounded border border-slate-100 shadow-sm">
-                                ${prov.desc}
-                            </p>
+                        <div class="border-b border-slate-200 bg-slate-50">
+                            <div class="p-4 md:p-6 flex justify-between items-center cursor-pointer select-none hover:bg-slate-100 transition-colors" onclick="toggleProvDesc('${prov.name}')">
+                                <h3 class="text-xl md:text-2xl font-bold text-slate-800 border-l-4 ${prov.color} pl-3">
+                                    ${prov.name} <span class="text-sm md:text-lg font-medium text-slate-500 ml-1">(${prov.kana})</span> <span class="hidden md:inline text-base font-normal text-slate-500 ml-2">- ${prov.title}</span>
+                                </h3>
+                                <span id="${iconId}" class="text-slate-500 font-bold px-2">${descIcon}</span>
+                            </div>
+                            <div id="${descId}" class="${descHiddenClass} px-4 md:px-6 pb-4 md:pb-6">
+                                <div class="text-slate-600 text-xs md:text-sm leading-relaxed bg-white p-3 md:p-4 rounded border border-slate-100 shadow-sm mt-2">
+                                    ${prov.desc}
+                                </div>
+                            </div>
                         </div>
                         <div class="data-table-container">
+                    `;
+
+                    // --- スマホ用 Lyonesse ---
+                    const useGroupHeader = mobile && isPvP && (!sortStates[prov.name] || sortStates[prov.name].col === 'area');
+
+                    if (useGroupHeader) {
+                        html += `
                             <table>
-                                <thead class="${prov.bg} text-white">
+                                <thead class="${prov.bg}">
                                     <tr>
-                                        <th class="${isPvP ? 'w-1/5' : 'w-1/4'} ${getSortClass('area')}" onclick="handleSort('${prov.name}', 'area')">エリア (Area)</th>
-                                        ${isPvP ? `<th class="w-1/5 ${getSortClass('name')}" onclick="handleSort('${prov.name}', 'name')">場所名 (Location)</th>` : ''}
-                                        <th class="${isPvP ? 'w-1/5' : 'w-1/4'} ${getSortClass('origin')}" onclick="handleSort('${prov.name}', 'origin')">語源・元ネタ</th>
-                                        <th class="${isPvP ? 'w-2/5' : 'w-2/4'} ${getSortClass('desc')}" onclick="handleSort('${prov.name}', 'desc')">詳細な背景・環境的文脈</th>
+                                        <th class="${getSortClass('name')}" onclick="handleSort('${prov.name}', 'name')" style="width:100px;">場所名</th>
+                                        <th class="${getSortClass('origin')}" onclick="handleSort('${prov.name}', 'origin')" style="width:90px;">語源</th>
+                                        <th class="${getSortClass('desc')}" onclick="handleSort('${prov.name}', 'desc')">詳細背景</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                    `;
-
-                    let skipAreaTd = 0;
-                    let areaGroupIndex = 0;
-
-                    provData.forEach((row, index) => {
-                        let tags = "";
-                        if (isPvP) {
-                            if (feudalShrines.includes(row.name)) {
-                                tags = `<div class="mt-2"><span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-800 border border-red-200 shadow-sm">🏛️ Feudal Shrine</span></div>`;
-                            } else {
-                                tags = `<div class="mt-2"><span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200 shadow-sm">🌲 Mournwood</span></div>`;
+                        `;
+                        let currentArea = "";
+                        provData.forEach(row => {
+                            if (row.area !== currentArea) {
+                                html += `<tr>
+                                    <td colspan="3" class="py-2 px-3 border-b border-indigo-200 bg-indigo-50 text-indigo-900 font-bold whitespace-nowrap">
+                                        ${row.area} <span class="text-[10px] font-normal opacity-80 ml-1">(${row.areaKana})</span>
+                                    </td>
+                                </tr>`;
+                                currentArea = row.area;
                             }
-                        }
+                            
+                            let tags = feudalShrines.includes(row.name) 
+                                ? `<div class="mt-1"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 border border-red-200 shadow-sm text-xs" title="Feudal Shrine">🏛️</span></div>` 
+                                : `<div class="mt-1"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-100 border border-purple-200 shadow-sm text-xs" title="Mournwood">🌲</span></div>`;
+                            
+                            html += `
+                                <tr>
+                                    <td class="font-bold text-slate-900">${row.name}<br><span class="text-[10px] font-normal text-slate-500">${row.kana}</span>${tags}</td>
+                                    <td class="text-xs text-slate-600 font-medium">${row.origin}</td>
+                                    <td class="leading-relaxed text-sm text-slate-700">${row.desc}</td>
+                                </tr>
+                            `;
+                        });
+                        html += `</tbody></table></div>`;
 
-                        let areaTd = "";
-                        let isNewArea = false;
-
-                        if (isPvP) {
-                            if (skipAreaTd === 0) {
-                                isNewArea = true;
-                                let rowspan = 1;
-                                for (let j = index + 1; j < provData.length; j++) {
-                                    if (provData[j].area === row.area) rowspan++;
-                                    else break;
-                                }
-                                skipAreaTd = rowspan - 1;
-                                const areaDisplay = row.area ? `${row.area}<br><span class="text-xs text-slate-500 font-normal mt-1 inline-block">${row.areaKana}</span>` : "-";
-                                const bgClass = areaGroupIndex % 2 === 0 ? "bg-indigo-50/40" : "bg-slate-50";
-                                areaGroupIndex++;
-                                areaTd = `<td rowspan="${rowspan}" class="font-bold text-slate-800 ${bgClass} border-r-2 border-slate-200 shadow-inner" style="vertical-align: middle; text-align: center;">${areaDisplay}</td>`;
-                            } else {
-                                skipAreaTd--;
-                            }
-                        } else {
-                            const areaDisplay = row.area ? `${row.area}<br><span class="text-xs text-slate-500 font-normal mt-1 inline-block">${row.areaKana}</span>` : "-";
-                            areaTd = `<td class="font-bold text-slate-900 text-base">${areaDisplay}</td>`;
-                        }
-
-                        const topBorderClass = isNewArea && index !== 0 ? "border-t-2 border-slate-300" : "";
+                    } else {
+                        // --- PC版 ＆ スマホ版Non-PvP ---
+                        
+                        // PCは左側の列幅を広く取って「詳細背景」を狭くして読みやすく、スマホは狭くして横スクロールのバランスを取る
+                        let areaWidth = mobile ? '90px' : (isPvP ? '140px' : '180px');
+                        let nameWidth = mobile ? '100px' : '200px'; // Lyonesse用
+                        let originWidth = mobile ? '90px' : '250px';
 
                         html += `
-                            <tr>
-                                ${areaTd}
-                                ${isPvP ? `<td class="font-bold text-slate-900 ${topBorderClass}">${row.name}<br><span class="text-xs font-normal text-slate-500 mt-1 inline-block">${row.kana}</span>${tags}</td>` : ''}
-                                <td class="text-xs text-slate-600 font-medium ${topBorderClass}">${row.origin}</td>
-                                <td class="leading-relaxed text-sm text-slate-700 ${topBorderClass}">${row.desc}</td>
-                            </tr>
+                            <table>
+                                <thead class="${prov.bg}">
+                                    <tr>
+                                        <th class="${getSortClass('area')}" onclick="handleSort('${prov.name}', 'area')" style="width:${areaWidth};">エリア</th>
+                                        ${isPvP ? `<th class="${getSortClass('name')}" onclick="handleSort('${prov.name}', 'name')" style="width:${nameWidth};">場所名</th>` : ''}
+                                        <th class="${getSortClass('origin')}" onclick="handleSort('${prov.name}', 'origin')" style="width:${originWidth};">語源</th>
+                                        <th class="${getSortClass('desc')}" onclick="handleSort('${prov.name}', 'desc')">詳細な背景・環境的文脈</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                         `;
-                    });
 
-                    html += `</tbody></table></div>`;
+                        let skipAreaTd = 0;
+                        provData.forEach((row, index) => {
+                            let tags = "";
+                            if (isPvP) {
+                                if (mobile) {
+                                    tags = feudalShrines.includes(row.name) 
+                                        ? `<div class="mt-1"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-100 border border-red-200 shadow-sm text-xs" title="Feudal Shrine">🏛️</span></div>` 
+                                        : `<div class="mt-1"><span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-100 border border-purple-200 shadow-sm text-xs" title="Mournwood">🌲</span></div>`;
+                                } else {
+                                    tags = feudalShrines.includes(row.name) 
+                                        ? `<div class="mt-2"><span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-800 border border-red-200 shadow-sm whitespace-nowrap">🏛️ Feudal Shrine</span></div>` 
+                                        : `<div class="mt-2"><span class="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200 shadow-sm whitespace-nowrap">🌲 Mournwood</span></div>`;
+                                }
+                            }
+
+                            let areaTd = "";
+                            if (isPvP && skipAreaTd === 0) {
+                                let rowspan = 1;
+                                for (let j = index + 1; j < provData.length; j++) if (provData[j].area === row.area) rowspan++; else break;
+                                skipAreaTd = rowspan - 1;
+                                areaTd = `<td rowspan="${rowspan}" class="font-bold text-center" style="vertical-align: middle;">${row.area}<br><span class="text-[10px] font-normal text-slate-500">${row.areaKana}</span></td>`;
+                            } else if (!isPvP) {
+                                areaTd = `<td class="font-bold">${row.area}<br><span class="text-[10px] font-normal text-slate-500">${row.areaKana}</span></td>`;
+                            } else if (isPvP) { skipAreaTd--; }
+
+                            html += `
+                                <tr>
+                                    ${areaTd}
+                                    ${isPvP ? `<td class="font-bold text-slate-900">${row.name}<br><span class="text-[10px] font-normal text-slate-500">${row.kana}</span>${tags}</td>` : ''}
+                                    <td class="text-xs text-slate-600 font-medium">${row.origin}</td>
+                                    <td class="leading-relaxed text-sm text-slate-700">${row.desc}</td>
+                                </tr>
+                            `;
+                        });
+                        html += `</tbody></table></div>`;
+                    }
+
                     section.innerHTML = html;
                     container.appendChild(section);
                 });
             }
-            statTotal.innerText = currentData.length;
+            document.getElementById('stat-total').innerText = currentData.length;
         }
 
-        function applySearch() {
-            const term = searchInput.value.toLowerCase();
-            const links = document.querySelectorAll('.prov-link');
-            const msg = document.getElementById('link-disabled-msg');
-
-            if (!term) {
-                currentData = [...rawData];
-                links.forEach(link => link.classList.remove('opacity-40', 'pointer-events-none', 'grayscale'));
-                msg.classList.add('hidden');
+        window.toggleProvDesc = function(provName) {
+            const desc = document.getElementById(`desc-${provName.replace(/\s+/g, '')}`);
+            const icon = document.getElementById(`icon-${provName.replace(/\s+/g, '')}`);
+            if (desc.classList.contains('hidden')) {
+                desc.classList.remove('hidden');
+                provDescStates[provName] = true;
+                if (icon) icon.innerText = '▲';
             } else {
-                currentData = rawData.filter(row => {
-                    const areaKanaSafe = row.areaKana || "";
-                    const nameSafe = row.name || "";
-                    const kanaSafe = row.kana || "";
-                    return nameSafe.toLowerCase().includes(term) || kanaSafe.includes(term) || row.desc.includes(term) || row.origin.includes(term) || row.area.toLowerCase().includes(term) || areaKanaSafe.includes(term);
-                });
-                links.forEach(link => link.classList.add('opacity-40', 'pointer-events-none', 'grayscale'));
-                msg.classList.remove('hidden');
+                desc.classList.add('hidden');
+                provDescStates[provName] = false;
+                if (icon) icon.innerText = '▼';
             }
-            renderTables();
-        }
+        };
+
+        window.toggleIntro = () => {
+            const content = document.getElementById('intro-content');
+            const icon = document.getElementById('intro-icon');
+            content.classList.toggle('hidden');
+            icon.innerText = content.classList.contains('hidden') ? '▼' : '▲';
+        };
 
         window.handleSort = function(provName, col) {
             if (!sortStates[provName]) sortStates[provName] = { col: col, asc: true };
-            else {
-                if (sortStates[provName].col === col) sortStates[provName].asc = !sortStates[provName].asc;
-                else sortStates[provName] = { col: col, asc: true };
+            else if (sortStates[provName].col === col) sortStates[provName].asc = !sortStates[provName].asc;
+            else sortStates[provName] = { col: col, asc: true };
+            renderTables();
+        };
+
+        function applySearch() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const msg = document.getElementById('link-disabled-msg');
+            const links = document.querySelectorAll('.prov-link');
+            
+            if (!term) {
+                currentData = [...rawData];
+                msg.classList.add('hidden');
+                links.forEach(l => l.classList.remove('opacity-40', 'pointer-events-none'));
+            } else {
+                currentData = rawData.filter(r => (r.name + r.kana + r.desc + r.origin + r.area + (r.areaKana||"")).toLowerCase().includes(term));
+                msg.classList.remove('hidden');
+                links.forEach(l => l.classList.add('opacity-40', 'pointer-events-none'));
             }
             renderTables();
         }
 
-        searchInput.addEventListener('input', applySearch);
-
-        window.copyToClipboard = function() {
-            let tsv = "Province (地方)\tエリア (Area)\t場所名 (Location)\t語源・元ネタ\t詳細な背景・環境的文脈\n";
+        window.copyToClipboard = () => {
+            let t = "Province\tArea\tLocation\tOrigin\tDescription\n";
             currentData.forEach(row => {
-                const safeDesc = row.desc.replace(/\n/g, ' '); 
-                let extraTag = "";
-                if (row.province === "Lyonesse") extraTag = feudalShrines.includes(row.name) ? " [Feudal Shrine]" : " [Mournwood]";
-                const areaStr = row.area ? `${row.area} (${row.areaKana})` : "-";
-                const nameStr = row.name ? `${row.name} (${row.kana})` : "";
-                tsv += `${row.province}\t${areaStr}\t${nameStr}\t${row.origin}\t${safeDesc}${extraTag}\n`;
+                let tag = row.province === "Lyonesse" ? (feudalShrines.includes(row.name) ? " [Shrine]" : " [Mournwood]") : "";
+                t += `${row.province}\t${row.area}(${row.areaKana})\t${row.name}(${row.kana})\t${row.origin}\t${row.desc}${tag}\n`;
             });
-            navigator.clipboard.writeText(tsv).then(() => showToast("クリップボードにコピーしました！\nExcelに直接貼り付けられます。"));
+            navigator.clipboard.writeText(t).then(() => {
+                const toast = document.getElementById('toast'); toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            });
         };
 
-        window.downloadCSV = function() {
-            let csvContent = '\uFEFF'; 
-            csvContent += "Province,Area,Location,Origin,Description\n";
+        window.downloadCSV = () => {
+            let c = '\uFEFFProvince,Area,Location,Origin,Description\n';
             currentData.forEach(row => {
-                let extraTag = "";
-                if (row.province === "Lyonesse") extraTag = feudalShrines.includes(row.name) ? " [Feudal Shrine]" : " [Mournwood]";
-                const areaStr = row.area ? `${row.area} (${row.areaKana})` : "-";
-                const nameStr = row.name ? `${row.name} (${row.kana})` : "";
-                const safeDesc = (row.desc + extraTag).replace(/"/g, '""');
-                csvContent += `"${row.province}","${areaStr}","${nameStr}","${row.origin}","${safeDesc}"\n`;
+                let tag = row.province === "Lyonesse" ? (feudalShrines.includes(row.name) ? " [Shrine]" : " [Mournwood]") : "";
+                c += `"${row.province}","${row.area}(${row.areaKana})","${row.name}(${row.kana})","${row.origin}","${row.desc}${tag}"\n`;
             });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", "PaxDei_Gallia_Database.csv");
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.href = URL.createObjectURL(new Blob([c], { type: 'text/csv;charset=utf-8;' }));
+            link.download = "PaxDei_Gallia_Database.csv"; link.click();
         };
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        window.addEventListener('DOMContentLoaded', renderTables);
+        document.getElementById('searchInput').addEventListener('input', applySearch);
+        window.addEventListener('resize', renderTables);
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
